@@ -413,3 +413,66 @@ This is how the LLM knows:
 Even though TypedDict is a clean and powerful way to structure output, it has a major limitation:
 
 **There is NO runtime data validation.**
+
+
+---
+
+
+# Output Parsers in LangChain
+
+Output parsers in LangChain convert raw LLM responses into structured and predictable formats. Without parsers, models return free-form text and metadata, which makes it harder to feed results into pipelines, applications, or further model calls. Parsers solve this by enforcing structure, types, and sometimes validation rules.
+
+Below are the main parser types commonly used in application workflows.
+
+---
+
+## 1. String Output Parser
+
+The **String Output Parser** returns the LLM response as a plain string. It removes metadata such as token usage, message roles, or structure wrappers, making it suitable for chaining prompts. When chaining, each LLM call can feed its result directly into the next one without manually accessing `.content`.
+
+In the example scenario, a detailed report about a topic is generated and then summarized. The string parser ensures that only the textual content is passed between the two steps, allowing both prompts to interact cleanly without result unpacking.
+
+This parser is ideal when the output is meant to be further processed by the LLM itself or displayed to a user, and no structural guarantees are required.
+
+---
+
+## 2. JSON Output Parser
+
+The **JSON Output Parser** converts the LLM output into JSON. This introduces structure to the output, making it machine-friendly and allowing further logic to operate on dictionaries instead of text.
+
+In the example, the LLM is asked to produce five facts about a topic in JSON form. The parser then converts that into a JSON object so downstream code can access fields directly (e.g., `result['facts']`).
+
+A key limitation is that the schema is not enforced. The LLM decides field names, nesting, and array structures. As a result, JSON Output Parser is useful for lightweight structuring but not for cases requiring consistency or strict data contracts.
+
+---
+
+## 3. Structured Output Parser (Schema Enforcement Without Validation)
+
+This parser uses Pydantic models to enforce a response structure. The model defines the expected fields and types, and the LLM is instructed to match that schema. The parser transforms the result into a Python object that directly conforms to that structure.
+
+In the example, a schema with three fields (`fact1`, `fact2`, `fact3`) is defined, and the model is asked to return facts that populate those fields. The structure is guaranteed, and type conversion is handled automatically.
+
+However, this parser enforces structure but not validation. It ensures that fields exist and have the correct basic types, but it does not validate semantic correctness or constraints.
+
+---
+
+## 4. Pydantic Output Parser (Schema + Validation)
+
+The **Pydantic Output Parser** is the strongest of the four in terms of control. It uses Pydantic’s full model system to enforce:
+
+* Structure
+* Field names
+* Data types
+* Validation rules (constraints)
+
+In the example, the model is asked to generate a fictional person's name, age, and city. The schema enforces:
+
+* `name`: string
+* `city`: string
+* `age`: integer greater than 18
+
+The validation constraint (`gt=18`) ensures the model cannot return an underage value. The parser converts the LLM output into a validated Pydantic model instance, giving native Python attribute access and reliable data guarantees.
+
+This parser is especially valuable in production settings where LLMs are part of a pipeline that depends on strict data contracts.
+
+
