@@ -127,12 +127,13 @@ Conditional chains represent reasoning-style workflows rather than linear transf
 
 Chains achieve separation of concerns for LLM applications:
 
-## Chain Type  | Solves         | Pattern  
----         | ---               | ---  
-Simple      | Minimal pipelines | input → output  
-Sequential  | Multi-step transformations | step1 → step2 → step3  
-Parallel    | Fan-out workflows | one → many → merge  
-Conditional | Runtime branching | if / else / fallback  
+## Chain Type    | Solves              | Pattern  
+---              | ---               | ---  
+Simple           | Minimal pipelines | input → output  
+Sequential       | Multi-step transformations | step1 → step2 → step3  
+Parallel         | Fan-out workflows | one → many → merge  
+Conditional      | Runtime branching | if / else / fallback  
 
 Using these patterns prevents code from devolving into ad-hoc glue logic, which is particularly valuable when scaling prototypes into production systems.
+
 
